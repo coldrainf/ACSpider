@@ -1,3 +1,3 @@
 # myProject
 
-’‚¿Ô «README.md
+This is README.md
