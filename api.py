@@ -7,6 +7,7 @@ from spider import Spider
 
 app = Flask("Spider")
 api = flask_restful.Api(app)
+
 sp = Spider()
 #搜索页面api
 class ComicSearch(Resource):
@@ -24,20 +25,13 @@ class ComicImg(Resource):
     def get(self):
         url = request.args.get('ch')
         p = request.args.get('p')
-        #重试6次
-        i = 0
-        while i < 6:
-            try:
-                return sp.comic_img(url, p)
-                i = 6
-            except:
-                i += 1
+        return sp.comic_img(url, p)
 
 api.add_resource(ComicSearch, '/spider/comicsearch')
 api.add_resource(ComicItem, '/spider/comicitem')
 api.add_resource(ComicImg, '/spider/comicimg')
 
 if __name__ == '__main__':
-    #主机为本地，端口号为5000
+    #主机为本地，端口号为5000,use_reloader=False使代码不会运行两遍
     #api举例：localhost:5000/spider/comicsearch?kw=进&p=1
-    app.run(host='localhost', port=5000, debug=True)
+    app.run(host='localhost', port=5000, debug=True, use_reloader=False)

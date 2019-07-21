@@ -8,8 +8,9 @@ import json
 from selenium import webdriver
 
 service_args = []
-service_args.append('--load-images=no')  ##关闭图片加载
+service_args.append('--load-images=false')  ##关闭图片加载
 service_args.append('--ignore-ssl-errors=true')  ##忽略https错误
+service_args.append('--disk-cache=true')  ##开启缓存
 
 class Spider:
     def __init__(self):
@@ -17,7 +18,7 @@ class Spider:
         self.count = 0
         self.browser = webdriver.PhantomJS(service_args=service_args)
         #设置加载页面超时
-        self.browser.set_page_load_timeout(7)
+        self.browser.set_page_load_timeout(5)
         self.s = requests.Session()
         self.s.headers.update({'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1'})
         #设置requests的重试次数
@@ -89,33 +90,41 @@ class Spider:
         self.count = self.count + 1
         if p is not None:
             URL += '?p=' + p
-        self.browser.get(URL)
+        i = 0
+        while i < 6:
+            try:
+                self.browser.get(URL)
+                h = etree.HTML(self.browser.page_source)
+                # 当前章节名
+                this = "//div[@class='subHeader']/a[@class='BarTit']/text()"
+                # 当前章节名
+                thisChapter = h.xpath(this)[0].replace('\n', '').strip()
+                i = 6
+            except(Exception):
+                print(Exception)
+                i += 1
         #获取前一章的内容
         prev = self.browser.execute_script('return prevChapterData')
         # 获取下一章的内容
         next = self.browser.execute_script('return nextChapterData')
-        h = etree.HTML(self.browser.page_source)
         #漫画名的字母代替
         slug = "//a[@class='iconRet']/@href"
         #漫画名+漫画章节名
         title = "//head/meta[@name='keywords']/@content"
-        #当前章节名
-        this = "//div[@class='subHeader']/a[@class='BarTit']/text()"
         #当前具体漫画图片的地址
         img = "//div[@id='images']/img/@src"
         #当前页数和总页数
         page = "//div[@id='images']/p/text()"
-        #当前章节名
-        thisChapter = h.xpath(this)[0].replace('\n', '').strip()
         #漫画名
         titleName = h.xpath(title)[0].replace(thisChapter, '')
         #因爬取后phantomjs的内存占用越来越多，所以采用这样的笨方法
         #另一点，这里我认为应该新开一个线程来重启，我这样会使等待延长很多，但是我不太会
-        #当计数到10之后，重启phantomjs
-        if(self.count > 10):
-            self.browser.delete_all_cookies()
+        #当计数到20之后，重启phantomjs
+        # self.browser.delete_all_cookies()
+        if(self.count > 20):
             self.browser.quit()
             self.browser = webdriver.PhantomJS(service_args=service_args)
+            self.browser.set_page_load_timeout(5)
             self.count = 0
         return {
             'prev': prev,
