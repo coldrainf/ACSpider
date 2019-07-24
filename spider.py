@@ -107,6 +107,7 @@ class Spider:
         prev = self.browser.execute_script('return prevChapterData')
         # 获取下一章的内容
         next = self.browser.execute_script('return nextChapterData')
+        cover = self.browser.execute_script('return pageImage')
         #漫画名的字母代替
         slug = "//a[@class='iconRet']/@href"
         #漫画名+漫画章节名
@@ -129,6 +130,7 @@ class Spider:
         return {
             'prev': prev,
             'next': next,
+            'cover': cover,
             "title": titleName,
             "this": thisChapter,
             "img": h.xpath(img),
