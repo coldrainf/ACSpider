@@ -100,8 +100,7 @@ class Spider:
                 # 当前章节名
                 thisChapter = h.xpath(this)[0].replace('\n', '').strip()
                 i = 6
-            except(Exception):
-                print(Exception)
+            except():
                 i += 1
         #获取前一章的内容
         prev = self.browser.execute_script('return prevChapterData')
@@ -120,7 +119,7 @@ class Spider:
         titleName = h.xpath(title)[0].replace(thisChapter, '')
         #因爬取后phantomjs的内存占用越来越多，所以采用这样的笨方法
         #另一点，这里我认为应该新开一个线程来重启，我这样会使等待延长很多，但是我不太会
-        #当计数到20之后，重启phantomjs
+        #当计数到50之后，重启phantomjs
         # self.browser.delete_all_cookies()
         if(self.count > 20):
             self.browser.quit()
@@ -138,15 +137,140 @@ class Spider:
             "slug": h.xpath(slug)[0].replace('https://m.manhuadui.com/manhua/', '')[:-1]
         }
 
+    # 动画时间表
+    def animate_table(self):
+        URL = 'http://m.yhdm.tv'
+        r = self.s.get(URL, timeout=(3, 4))
+        h = etree.HTML(r.text.encode('ISO-8859-1'))
+        titles = []
+        urls = []
+        news = []
+        newUrls = []
+        for index in range(7):
+            title = "//div[@class='tlist']/ul[%d]/li/a/text()"
+            url = "//div[@class='tlist']/ul[%d]/li/a/@href"
+            new = "//div[@class='tlist']/ul[%d]/li/span/a/text()"
+            newUrl = "//div[@class='tlist']/ul[%d]/li/span/a/@href"
+            titles.append(h.xpath(title%(index+1)))
+            urls.append(h.xpath(url%(index+1)))
+            news.append(h.xpath(new%(index+1)))
+            newUrls.append(h.xpath(newUrl%(index+1)))
+        r.close()
+        return {
+            "title": titles,
+            "url": urls,
+            "new": news,
+            "newUrl": newUrls
+        }
+
+    # 动画搜索
+    def animate_search(self, kw):
+        URL = 'http://m.yhdm.tv/search/'
+        if kw is not None:
+            URL += kw
+        r = self.s.get(URL, timeout=(3, 4))
+        h = etree.HTML(r.text)
+        # 动画名
+        title = "//a[@class='itemtext']/text()"
+        # 封面url
+        cover = "//div[@class='imgblock']/@style"
+        # 最新集
+        new = "//div[@class='itemimgtext']/text()"
+        # 地址
+        url = "//a[@class='itemtext']/@href"
+        r.close()
+        return {
+            "title": h.xpath(title),
+            "cover": h.xpath(cover),
+            "new": h.xpath(new),
+            "url": h.xpath(url)
+        }
+
+    # 动画详情页
+    def animate_item(self, url):
+        URL = 'http://m.yhdm.tv'
+        if url is not None:
+            URL += url
+        r = self.s.get(URL, timeout=(3, 4))
+        h = etree.HTML(r.text.encode('ISO-8859-1'))
+        # 动画名
+        title = "//div[@class='show']/h1/text()"
+        # 封面url
+        cover = "//div[@class='show']/img/@src"
+        # 最新集
+        new = "//div[@class='show']/p[2]/text()"
+        # 上映日期
+        time = "//div[@class='show']/p[3]/text()"
+        # 类型
+        type = "//div[@class='show']/p[4]/a/text()"
+        # 介绍
+        info = "//div[@class='info']/text()"
+        # 各章节名
+        chapterName = "//div[@id='playlists']/ul/li/a/text()"
+        # 各章节url
+        chapterURL = "//div[@id='playlists']/ul/li/a/@href"
+        r.close()
+        return {
+            "title": h.xpath(title),
+            "cover": h.xpath(cover),
+            "new": h.xpath(new),
+            "time": h.xpath(time),
+            "type": h.xpath(type),
+            "info": h.xpath(info),
+            "chapterName": h.xpath(chapterName),
+            "chapterURL": h.xpath(chapterURL)
+        }
+
+    #动画页面
+    def animate_video(self, url):
+        URL = 'http://m.yhdm.tv'
+        if url is not None:
+            URL += url
+        r = self.s.get(URL, timeout=(3, 4))
+        h = etree.HTML(r.text.encode('ISO-8859-1'))
+        # 动画名
+        title = "//div[@class='tit']/h1/a/text()"
+        url =  "//div[@class='tit']/h1/a/@href"
+        thisName = "//div[@class='tit']/h1/span/text()"
+        # 播放器容器，需配合该网站js文件
+        player = "//div[@class='player']/div"
+        # 各章节名
+        chapterName = "//div[@id='playlists']/ul/li/a/text()"
+        # 各章节url
+        chapterURL = "//div[@id='playlists']/ul/li/a/@href"
+        # 当前观看
+        this = "//div[@id='playlists']/ul/li[@class='sel']/a/@href"
+        r.close()
+        return {
+            "title": h.xpath(title),
+            "url": h.xpath(url),
+            "thisName": h.xpath(thisName),
+            "player": etree.tostring(h.xpath(player)[0], encoding='utf-8').decode().replace('/>', '>'),
+            "chapterName": h.xpath(chapterName),
+            "chapterURL": h.xpath(chapterURL),
+            "this": h.xpath(this)
+        }
+
 if __name__ == '__main__':
     kw = '进'
     name = 'haizeiwang'
     comic = "https://m.manhuadui.com/manhua/haizeiwang/296660.html"
-
     sp = Spider()
+
     search = sp.comic_search(kw, '1')
-    print('search', search)
+    print('comicsearch', search)
     item = sp.comic_item(name)
-    print('item', item)
+    print('comicitem', item)
     img = sp.comic_img(comic, '1')
-    print('img', img)
+    print('comicimg', img)
+
+    search = sp.animate_search(kw)
+    print('animatesearch', search)
+    nameUrl = '/show/4642.html'
+    item = sp.animate_item(nameUrl)
+    print('animateitem', item)
+    videoUrl = '/v/4642-4.html'
+    video = sp.animate_video(videoUrl)
+    print('animatevideo', video)
+    table = sp.animate_table()
+    print('animatetable', table)

@@ -1,11 +1,13 @@
 # ComicSpider
-漫画爬虫API,数据源为漫画堆,应用了python3.5+requests+selenium+phantomjs+flask
+动画漫画爬虫API,数据源为漫画堆和樱花动漫,应用了python3.5+requests+selenium+phantomjs+flask
 
 这是我为了做一个漫画网站而写的爬虫API。网站现已上线，似乎因为服务器在国外，导致传输速率比较慢
 
 网址：http://116.62.161.40	coldrain.top
 
 备用：coldrain.zicp.net	---这个网站的服务器就是我的笔记本，所以能不能连上看情况
+
+7.28  添加动画爬虫,数据来源于樱花动漫
 
 
 ## 文件作用
