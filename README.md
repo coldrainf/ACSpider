@@ -1,5 +1,6 @@
-# ComicSpider
-动画漫画爬虫API,数据源为漫画堆和樱花动漫,应用了python3.5+requests+selenium+phantomjs+flask
+# ACSpider
+
+漫画动画爬虫API,数据源为漫画堆和樱花动漫,应用了python3.5+requests+selenium+phantomjs+flask
 
 这是我为了做一个漫画网站而写的爬虫API。网站现已上线，似乎因为服务器在国外，导致传输速率比较慢
 
