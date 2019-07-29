@@ -119,7 +119,7 @@ class Spider:
         titleName = h.xpath(title)[0].replace(thisChapter, '')
         #因爬取后phantomjs的内存占用越来越多，所以采用这样的笨方法
         #另一点，这里我认为应该新开一个线程来重启，我这样会使等待延长很多，但是我不太会
-        #当计数到50之后，重启phantomjs
+        #当计数到20之后，重启phantomjs
         # self.browser.delete_all_cookies()
         if(self.count > 20):
             self.browser.quit()
@@ -233,7 +233,7 @@ class Spider:
         url =  "//div[@class='tit']/h1/a/@href"
         thisName = "//div[@class='tit']/h1/span/text()"
         # 播放器容器，需配合该网站js文件
-        player = "//div[@class='player']/div"
+        player = "//div[@class='player']/div/@data-vid"
         # 各章节名
         chapterName = "//div[@id='playlists']/ul/li/a/text()"
         # 各章节url
@@ -245,10 +245,30 @@ class Spider:
             "title": h.xpath(title),
             "url": h.xpath(url),
             "thisName": h.xpath(thisName),
-            "player": etree.tostring(h.xpath(player)[0], encoding='utf-8').decode().replace('/>', '>'),
+            # "player": etree.tostring(h.xpath(player)[0], encoding='utf-8').decode().replace('/>', '>'),
+            "player": h.xpath(player)[0],
             "chapterName": h.xpath(chapterName),
             "chapterURL": h.xpath(chapterURL),
             "this": h.xpath(this)
+        }
+    #可直接获取video地址，现已作废
+    def video(self, URL):
+        self.count = self.count + 1
+        i = 0
+        while i < 6:
+            try:
+                self.browser.get(URL)
+                h = etree.HTML(self.browser.page_source)
+                i = 6
+            except():
+                i += 1
+        if(self.count > 20):
+            self.browser.quit()
+            self.browser = webdriver.PhantomJS(service_args=service_args)
+            self.browser.set_page_load_timeout(5)
+            self.count = 0
+        return {
+            'src': h.xpath('//video/@src')
         }
 
 if __name__ == '__main__':
@@ -257,20 +277,23 @@ if __name__ == '__main__':
     comic = "https://m.manhuadui.com/manhua/haizeiwang/296660.html"
     sp = Spider()
 
-    search = sp.comic_search(kw, '1')
-    print('comicsearch', search)
-    item = sp.comic_item(name)
-    print('comicitem', item)
-    img = sp.comic_img(comic, '1')
-    print('comicimg', img)
-
-    search = sp.animate_search(kw)
-    print('animatesearch', search)
-    nameUrl = '/show/4642.html'
-    item = sp.animate_item(nameUrl)
-    print('animateitem', item)
+    # search = sp.comic_search(kw, '1')
+    # print('comicsearch', search)
+    # item = sp.comic_item(name)
+    # print('comicitem', item)
+    # img = sp.comic_img(comic, '1')
+    # print('comicimg', img)
+    #
+    # table = sp.animate_table()
+    # print('animatetable', table)
+    # search = sp.animate_search(kw)
+    # print('animatesearch', search)
+    # nameUrl = '/show/4642.html'
+    # item = sp.animate_item(nameUrl)
+    # print('animateitem', item)
     videoUrl = '/v/4642-4.html'
     video = sp.animate_video(videoUrl)
     print('animatevideo', video)
-    table = sp.animate_table()
-    print('animatetable', table)
+    # videoUrl = 'http://tup.yhdm.tv/?vid=http://quan.qq.com/video/1098_da55dca635b47b0826e85e5996f9d65c$mp4&m=1'
+    # video = sp.video(videoUrl)
+    # print('animatevideo', video)

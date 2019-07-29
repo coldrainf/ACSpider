@@ -45,6 +45,11 @@ class AnimateVideo(Resource):
     def get(self):
         url = request.args.get('url')
         return sp.animate_video(url)
+#作废
+# class Video(Resource):
+#     def get(self):
+#         src = request.args.get('src')
+#         return sp.video(src)
 
 api.add_resource(ComicSearch, '/spider/comicsearch')
 api.add_resource(ComicItem, '/spider/comicitem')
@@ -53,6 +58,7 @@ api.add_resource(AnimateTable, '/spider/animatetable')
 api.add_resource(AnimateSearch, '/spider/animatesearch')
 api.add_resource(AnimateItem, '/spider/animateitem')
 api.add_resource(AnimateVideo, '/spider/animatevideo')
+# api.add_resource(Video, '/spider/video')
 
 if __name__ == '__main__':
     #主机为本地，端口号为5000,use_reloader=False使代码不会运行两遍
