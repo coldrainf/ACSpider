@@ -223,28 +223,34 @@ class Spider:
 
     #动画页面
     def animate_video(self, url):
-        URL = 'http://m.yhdm.tv'
+        URL = 'http://www.yhdm.tv'
         if url is not None:
             URL += url
         r = self.s.get(URL, timeout=(3, 4))
         h = etree.HTML(r.text.encode('ISO-8859-1'))
         # 动画名
-        title = "//div[@class='tit']/h1/a/text()"
-        url =  "//div[@class='tit']/h1/a/@href"
-        thisName = "//div[@class='tit']/h1/span/text()"
+        title = "//div[@class='gohome l']/h1/a/text()"
+        url =  "//div[@class='gohome l']/h1/a/@href"
+        thisName = "//div[@class='gohome l']/h1/span/text()"
+        pn = "//div[@class='fav r']/span/text()"
+        pnName = "//div[@class='fav r']/a/text()"
+        pnURL = "//div[@class='fav r']/a/@href"
         # 播放器容器，需配合该网站js文件
-        player = "//div[@class='player']/div/@data-vid"
+        player = "//div[@id='playbox']/@data-vid"
         # 各章节名
-        chapterName = "//div[@id='playlists']/ul/li/a/text()"
+        chapterName = "//div[@class='movurls']/ul/li/a/text()"
         # 各章节url
-        chapterURL = "//div[@id='playlists']/ul/li/a/@href"
+        chapterURL = "//div[@class='movurls']/ul/li/a/@href"
         # 当前观看
-        this = "//div[@id='playlists']/ul/li[@class='sel']/a/@href"
+        this = "//div[@class='movurls']/ul/li[@class='sel']/a/@href"
         r.close()
         return {
             "title": h.xpath(title),
             "url": h.xpath(url),
             "thisName": h.xpath(thisName),
+            "pn": h.xpath(pn),
+            "pnName": h.xpath(pnName),
+            "pnURL": h.xpath(pnURL),
             # "player": etree.tostring(h.xpath(player)[0], encoding='utf-8').decode().replace('/>', '>'),
             "player": h.xpath(player)[0],
             "chapterName": h.xpath(chapterName),
