@@ -18,7 +18,7 @@ class Spider:
         self.count = 0
         self.browser = webdriver.PhantomJS(service_args=service_args)
         #设置加载页面超时
-        self.browser.set_page_load_timeout(5)
+        self.browser.set_page_load_timeout(3)
         self.s = requests.Session()
         self.s.headers.update({'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1'})
         #设置requests的重试次数
@@ -86,13 +86,13 @@ class Spider:
     #URL: 该章节具体地址，为移动端地址
     #p: 页数
     def comic_img(self, URL, p):
-        #爬取一次，计数
-        self.count = self.count + 1
         if p is not None:
             URL += '?p=' + p
         i = 0
         while i < 6:
             try:
+                # 爬取一次，计数
+                self.count = self.count + 1
                 self.browser.get(URL)
                 h = etree.HTML(self.browser.page_source)
                 # 当前章节名
@@ -100,7 +100,7 @@ class Spider:
                 # 当前章节名
                 thisChapter = h.xpath(this)[0].replace('\n', '').strip()
                 i = 6
-            except():
+            except Exception:
                 i += 1
         #获取前一章的内容
         prev = self.browser.execute_script('return prevChapterData')
@@ -123,9 +123,9 @@ class Spider:
         # self.browser.delete_all_cookies()
         if(self.count > 20):
             self.browser.quit()
-            self.browser = webdriver.PhantomJS(service_args=service_args)
-            self.browser.set_page_load_timeout(5)
             self.count = 0
+            self.browser = webdriver.PhantomJS(service_args=service_args)
+            self.browser.set_page_load_timeout(3)
         return {
             'prev': prev,
             'next': next,
@@ -259,20 +259,20 @@ class Spider:
         }
     #可直接获取video地址，现已作废
     def video(self, URL):
-        self.count = self.count + 1
         i = 0
         while i < 6:
             try:
+                self.count = self.count + 1
                 self.browser.get(URL)
                 h = etree.HTML(self.browser.page_source)
                 i = 6
-            except():
+            except Exception:
                 i += 1
         if(self.count > 20):
             self.browser.quit()
-            self.browser = webdriver.PhantomJS(service_args=service_args)
-            self.browser.set_page_load_timeout(5)
             self.count = 0
+            self.browser = webdriver.PhantomJS(service_args=service_args)
+            self.browser.set_page_load_timeout(3)
         return {
             'src': h.xpath('//video/@src')
         }

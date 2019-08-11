@@ -4,6 +4,10 @@ from flask import Flask, request
 import flask_restful
 from flask_restful import Resource
 from spider import Spider
+import logging
+#设置log级别,过滤access日志,降低内存
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.WARNING)
 
 app = Flask("Spider")
 api = flask_restful.Api(app)
@@ -14,37 +18,51 @@ class ComicSearch(Resource):
     def get(self):
         kw = request.args.get('kw')
         p = request.args.get('p')
-        return sp.comic_search(kw, p)
+        try: res = sp.comic_search(kw, p)
+        except: res = ''
+        finally: return res
 #漫画详情页面
 class ComicItem(Resource):
     def get(self):
         name = request.args.get('slug')
-        return sp.comic_item(name)
+        try: res = sp.comic_item(name)
+        except: res = ''
+        finally: return res
 #漫画章节页面
 class ComicImg(Resource):
     def get(self):
         url = request.args.get('ch')
         p = request.args.get('p')
-        return sp.comic_img(url, p)
+        try: res = sp.comic_img(url, p)
+        except: res = ''
+        finally: return res
 #动画时间表
 class AnimateTable(Resource):
     def get(self):
-        return sp.animate_table()
+        try: res = sp.animate_table()
+        except: res = ''
+        finally: return res
 #动画搜索页面
 class AnimateSearch(Resource):
     def get(self):
         kw = request.args.get('kw')
-        return sp.animate_search(kw)
+        try: res = sp.animate_search(kw)
+        except: res = ''
+        finally: return res
 #动画详情页面
 class AnimateItem(Resource):
     def get(self):
         url = request.args.get('url')
-        return sp.animate_item(url)
+        try: res = sp.animate_item(url)
+        except: res = ''
+        finally: return res
 #动画章节页面
 class AnimateVideo(Resource):
     def get(self):
         url = request.args.get('url')
-        return sp.animate_video(url)
+        try: res = sp.animate_video(url)
+        except: res = ''
+        finally: return res
 #作废
 # class Video(Resource):
 #     def get(self):
