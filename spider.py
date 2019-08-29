@@ -6,17 +6,22 @@ import requests
 from requests.adapters import HTTPAdapter
 import json
 from selenium import webdriver
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 service_args = []
 service_args.append('--load-images=false')  ##关闭图片加载
 service_args.append('--ignore-ssl-errors=true')  ##忽略https错误
 service_args.append('--disk-cache=true')  ##开启缓存
+dcap = dict(DesiredCapabilities.PHANTOMJS)
+dcap["phantomjs.page.settings.userAgent"] = (
+    "Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1"
+)
 
 class Spider:
     def __init__(self):
         #计数，达到一定量重启phantomjs
         self.count = 0
-        self.browser = webdriver.PhantomJS(service_args=service_args)
+        self.browser = webdriver.PhantomJS(service_args=service_args, desired_capabilities=dcap)
         #设置加载页面超时
         self.browser.set_page_load_timeout(3)
         self.s = requests.Session()
@@ -124,7 +129,7 @@ class Spider:
         if(self.count > 20):
             self.browser.quit()
             self.count = 0
-            self.browser = webdriver.PhantomJS(service_args=service_args)
+            self.browser = webdriver.PhantomJS(service_args=service_args, desired_capabilities=dcap)
             self.browser.set_page_load_timeout(3)
         return {
             'prev': prev,
@@ -271,7 +276,7 @@ class Spider:
         if(self.count > 20):
             self.browser.quit()
             self.count = 0
-            self.browser = webdriver.PhantomJS(service_args=service_args)
+            self.browser = webdriver.PhantomJS(service_args=service_args, desired_capabilities=dcap)
             self.browser.set_page_load_timeout(3)
         return {
             'src': h.xpath('//video/@src')
