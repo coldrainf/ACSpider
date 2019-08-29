@@ -10,7 +10,7 @@ from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 service_args = []
 service_args.append('--load-images=false')  ##关闭图片加载
-service_args.append('--ignore-ssl-errors=true')  ##忽略https错误
+service_args.append('--ignore-ssl-errors=true')  ##忽略https错误 
 service_args.append('--disk-cache=true')  ##开启缓存
 dcap = dict(DesiredCapabilities.PHANTOMJS)
 dcap["phantomjs.page.settings.userAgent"] = (
