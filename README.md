@@ -1,11 +1,7 @@
 # ACSpider
 动画漫画爬虫API,数据源为漫画堆和樱花动漫,应用了python3.5+requests+selenium+phantomjs+flask
 
-这是我为了做一个动漫搜索网站而写的爬虫API。网站现已上线，似乎因为服务器在国外，导致传输速率比较慢
-
-网址：coldrain.top
-
-备用：coldrain.zicp.net	---这个网站的服务器就是我的笔记本，所以能不能连上看情况
+这是我为了做一个动漫搜索网站而写的爬虫API。(现已废弃)
 
 7.29 更改获取动画地址的方式
 
